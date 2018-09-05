@@ -1,0 +1,13 @@
+{
+  "name": "JimmyCoin",
+  "version": "1.0.0",
+  "description": "My precious coin",
+  "main": "src/server.js",
+  "repository": "https://github.com/16072018/blockchainTech",
+  "author": "JoonHyung (Jim) Park",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "crypto-js": "^3.1.9-1"
+  }
+}
