@@ -4,7 +4,8 @@ const WebSockets = require('ws'),
 const { getLastBlock,
         isNewStructureValid,
         addBlockToChain,
-        replaceChain } = Blockchain;
+        replaceChain,
+        getBlockchain } = Blockchain;
 
 const sockets = [];
 
@@ -72,6 +73,8 @@ const handleSocketMessages = ws => {
             case GET_LATEST:
                 sendMessage(ws, responseLatest());
                 break;
+            case GET_ALL:
+                sendMessage(ws, responseAll());
             case BLOCKCHAIN_RESPONSE:
                 const receivedBlocks = message.data;
                 if (receivedBlocks === null) {
@@ -96,9 +99,12 @@ const handleBlockchainResponse = receivedBlocks => {
     const newestBlock = getLastBlock();
     if (latestBlockReceived.index > newestBlock.index) {
         if (newestBlock.hash === latestBlockReceived.previousHash) {
-            addBlockToChain(latestBlockReceived);
+            if (addBlockToChain(latestBlockReceived)) {
+                broadcastNewBlock();
+            }
         } else if (receivedBlocks.length === 1) {
             // get all the blocks
+            sendMessageToAll(getAll());
         } else {
             replaceChain(receivedBlocks)
         }
@@ -107,7 +113,13 @@ const handleBlockchainResponse = receivedBlocks => {
 
 const sendMessage = (ws, message) => ws.send(JSON.stringify(message));
 
+const sendMessageToAll = message => sockets.forEach(ws => sendMessage(ws, message));
+
 const responseLatest = () => blockchainResponse([getLastBlock()]);
+
+const responseAll = () => blockchainResponse(getBlockchain());
+
+const broadcastNewBlock = () => sendMessageToAll(responseLatest());
 
 const handleSocketError = ws => {
     const closeSocketConnection = ws => {
@@ -128,5 +140,6 @@ const connectToPeers = newPeer => {
 
 module.exports = {
     startP2PServer,
-    connectToPeers
+    connectToPeers,
+    broadcastNewBlock
 };

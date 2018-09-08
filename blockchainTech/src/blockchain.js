@@ -47,6 +47,7 @@ const createNewBlock = data => {
         data
     );
     addBlockToChain(newBlock);
+    require("./p2p").broadcastNewBlock();
     return newBlock;
 };
 
