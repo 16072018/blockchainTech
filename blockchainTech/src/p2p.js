@@ -24,8 +24,8 @@ const getLatest = () => {
 
 const getAll = () => {
     return {
-        type: GET_ALL,
-        data: null
+        type: GET_ALL, // type: what kind of action it will perform
+        data: null     // redux format should return its own parameter
     };
 };
 
